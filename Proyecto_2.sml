@@ -108,19 +108,30 @@ fun officiate(cards : card list, moves : move list, goal : int) =
           held_cards -> pierde una carta
           remaining_moves -> se juega el resto de la lista *)
         | (remaining_cards, held_cards, Discard c::tl_remaining_moves) => (play(remaining_cards, remove_card(held_cards, c, IllegalMove), tl_remaining_moves))
-        (* Se toma una carta y quedan jugadas, juego sigue
+        (* Se toma una carta y quedan jugadas, juego sigue a menos que la suma
+          de las held_cards sea mayor a goal.
           remaining_cards -> pierde una carta
           held_cards -> suma una carta
           remaining_moves -> se juega el resto de la lista *)
         | (remaining_cards, held_cards, Draw::tl_remaining_moves) => let
+                                                                        (* Tope de la pila de cartas *)
                                                                         val top::_ = remaining_cards
+                                                                        (* Resultado preliminar antes de verificar la suma
+                                                                          de las held_cards*)
                                                                         val preliminary_score = score(top::held_cards, goal)
                                                                       in
+                                                                        (* Si la suma de las held_cards es mayor a goal *)
                                                                         if(preliminary_score > goal)
-                                                                        then preliminary_score
+                                                                        then preliminary_score (* entonces retorna el resultado
+                                                                                                  preliminar como final *)
+                                                                        (* Si no es mayor, el juego sigue con una carta menos
+                                                                          en la pila, una carta mas en las held_cards y el
+                                                                          siguiente movimiento *)
                                                                         else play(remove_card(remaining_cards, top, IllegalMove), top::held_cards, tl_remaining_moves)
                                                                       end
   in
+    (* Se llama a la funcion auxiliar con la pila de cartas, las held_cards
+      vacias y la lista de movimientos *)
     play(cards, [], moves)
   end
 
