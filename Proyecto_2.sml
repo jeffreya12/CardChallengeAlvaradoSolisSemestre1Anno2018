@@ -41,14 +41,12 @@ fun remove_card (cs : card list, c : card, e) =
 (* d *)
 fun all_same_color (cs : card list) =
   case cs of
-    [] => false (* Si la lista esta vacia, retorna false *)
+    [] => true (* Si la lista esta vacia, retorna true *)
     | hd::[] => true (* Si la lista tiene solo un elemento, retorna true *)
-    (* Si la lista tiene tiene dos elementos, los compara y retorna el
-       resutado de la comparacion *)
-    | hd::mid::[] => card_color (hd) = card_color (mid)
     (* Si la lista tiene mas de dos elementos, compara los primeros dos y aplica
-       un AND con la llamada recursiva a la funcion con el resto de la lista *)
-    | hd::mid::tl => card_color (hd) = card_color (mid) andalso all_same_color(tl)
+       un AND con la llamada recursiva a la funcion con el resto de la lista y
+       el último elemento que se comparó *)
+    | hd::mid::tl => card_color (hd) = card_color (mid) andalso all_same_color(mid::tl)
 
 (* e *)
 fun sum_cards (cs : card list) =
@@ -116,13 +114,12 @@ fun officiate(cards : card list, moves : move list, goal : int) =
         | (remaining_cards, held_cards, Draw::tl_remaining_moves) => let
                                                                         (* Tope de la pila de cartas *)
                                                                         val top::_ = remaining_cards
-                                                                        (* Resultado preliminar antes de verificar la suma
-                                                                          de las held_cards*)
-                                                                        val preliminary_score = score(top::held_cards, goal)
+                                                                        (* Suma de las held cards*)
+                                                                        val preliminary_score = sum_cards(top::held_cards)
                                                                       in
                                                                         (* Si la suma de las held_cards es mayor a goal *)
                                                                         if(preliminary_score > goal)
-                                                                        then preliminary_score (* entonces retorna el resultado
+                                                                        then score(top::held_cards, goal) (* entonces retorna el resultado
                                                                                                   preliminar como final *)
                                                                         (* Si no es mayor, el juego sigue con una carta menos
                                                                           en la pila, una carta mas en las held_cards y el
